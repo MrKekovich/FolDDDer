@@ -21,12 +21,14 @@ fun getRouteTemplate(routeName: String, packageName: String): String {
 }
 
 fun getUseCaseImplTemplate(useCaseName: String, packageName: String): String {
+    val interfaceName = useCaseName.replace("Impl", "")
+
     return """
         package $packageName.application.usecase
 
-        import $packageName.domain.usecase.$useCaseName
+        import $packageName.domain.usecase.$interfaceName
         
-        class ${useCaseName}Impl : $useCaseName
+        class $useCaseName : $interfaceName
     """.trimIndent()
 }
 
@@ -55,12 +57,14 @@ fun getRepositoryTemplate(repositoryName: String, packageName: String): String {
 }
 
 fun getRepositoryImplTemplate(repositoryName: String, packageName: String): String {
+    val interfaceName = repositoryName.replace("Impl", "")
+
     return """
         package $packageName.infrastructure.repository
         
-        import $packageName.domain.repository.$repositoryName
+        import $packageName.domain.repository.$interfaceName
         
-        class ${repositoryName}Impl : $repositoryName
+        class $repositoryName : $interfaceName
     """.trimIndent()
 }
 

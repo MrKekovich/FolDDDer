@@ -18,6 +18,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.util.PsiUtil
 import io.github.mrkekovich.folddders.asset.PlatformAssets
+import io.github.mrkekovich.folddders.template.getDaoTemplate
 import io.github.mrkekovich.folddders.template.getDtoTemplate
 import io.github.mrkekovich.folddders.template.getEntityTemplate
 import io.github.mrkekovich.folddders.template.getRepositoryImplTemplate
@@ -155,14 +156,16 @@ private data class DDDFolderStructure(
 
         applicationRoute.createFile(parent, "${name}Routes", ::getRouteTemplate)
 
-        applicationUseCase.createFile(parent, "${name}UseCase", ::getUseCaseImplTemplate)
+        applicationUseCase.createFile(parent, "${name}UseCaseImpl", ::getUseCaseImplTemplate)
 
         domainEntity.createFile(parent, "${name}Entity", ::getEntityTemplate)
         domainRepository.createFile(parent, "${name}Repository", ::getRepositoryTemplate)
         domainUseCase.createFile(parent, "${name}UseCase", ::getUseCaseTemplate)
 
         infrastructurePersistence.createFile(parent, "${name}Table", ::getTableTemplate)
-        infrastructureRepository.createFile(parent, "${name}Repository", ::getRepositoryImplTemplate)
+//        infrastructurePersistence.createFile(parent, "${name}Dao", ::getDaoTemplate) // TODO: Uncomment if needed.
+
+        infrastructureRepository.createFile(parent, "${name}RepositoryImpl", ::getRepositoryImplTemplate)
     }
 }
 
