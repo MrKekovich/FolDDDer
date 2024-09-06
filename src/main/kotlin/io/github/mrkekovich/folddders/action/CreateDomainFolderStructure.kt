@@ -14,11 +14,9 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.util.PsiUtil
 import io.github.mrkekovich.folddders.asset.PlatformAssets
-import io.github.mrkekovich.folddders.template.getDaoTemplate
 import io.github.mrkekovich.folddders.template.getDtoTemplate
 import io.github.mrkekovich.folddders.template.getEntityTemplate
 import io.github.mrkekovich.folddders.template.getRepositoryImplTemplate
@@ -28,7 +26,6 @@ import io.github.mrkekovich.folddders.template.getTableTemplate
 import io.github.mrkekovich.folddders.template.getUseCaseImplTemplate
 import io.github.mrkekovich.folddders.template.getUseCaseTemplate
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
-import kotlin.reflect.KFunction2
 
 private const val WITHOUT_FILES = "DDD_EMPTY"
 private const val WITH_FILES = "DDD_WITH_FILES"
@@ -48,8 +45,8 @@ class CreateDomainFolderStructure :
         builder.setTitle(CAPTION)
         builder.setValidator(ClassInputValidator(project, directory))
 
-        builder.addKind("Without files", AllIcons.Actions.NewFolder, WITHOUT_FILES)
         builder.addKind("With files", AllIcons.Actions.AddFile, WITH_FILES)
+        builder.addKind("Without files", AllIcons.Actions.NewFolder, WITHOUT_FILES)
     }
 
     override fun checkPackageExists(directory: PsiDirectory): Boolean {
@@ -149,7 +146,6 @@ private data class DDDFolderStructure(
 ) {
     fun createFiles() {
         val name = name.replaceFirstChar { it.uppercase() }
-        val packageName = JavaDirectoryService.getInstance().getPackage(parent)!!.qualifiedName
 
         applicationDto.createFile(parent, "${name}Request", ::getDtoTemplate)
         applicationDto.createFile(parent, "${name}Response", ::getDtoTemplate)
