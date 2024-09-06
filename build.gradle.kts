@@ -1,7 +1,7 @@
 plugins {
-    id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.intellij") version "1.17.4" // Use the IntelliJ plugin
+    kotlin("jvm") version "1.9.25"
+    java
 }
 
 group = "io.github.mrkekovich.folddders"
@@ -11,13 +11,13 @@ repositories {
     mavenCentral()
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.set("2023.2.6")
-    type.set("IC") // Target IDE Platform
+    plugins.set(listOf("java", "org.jetbrains.kotlin")) // Add Kotlin plugin
+}
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
 tasks {
