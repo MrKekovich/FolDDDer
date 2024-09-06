@@ -12,11 +12,22 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.JavaDirectoryService
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.util.PsiUtil
 import io.github.mrkekovich.folddders.asset.PlatformAssets
+import io.github.mrkekovich.folddders.template.getDtoTemplate
+import io.github.mrkekovich.folddders.template.getEntityTemplate
+import io.github.mrkekovich.folddders.template.getRepositoryImplTemplate
+import io.github.mrkekovich.folddders.template.getRepositoryTemplate
+import io.github.mrkekovich.folddders.template.getRouteTemplate
+import io.github.mrkekovich.folddders.template.getTableTemplate
+import io.github.mrkekovich.folddders.template.getUseCaseImplTemplate
+import io.github.mrkekovich.folddders.template.getUseCaseTemplate
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
+import kotlin.reflect.KFunction2
 
 private const val WITHOUT_FILES = "DDD_EMPTY"
 private const val WITH_FILES = "DDD_WITH_FILES"
@@ -111,6 +122,7 @@ private fun addDirectories(
 
     return DDDFolderStructure(
         name = inputName,
+        parent = parent,
         applicationDto = applicationDto,
         applicationRoute = applicationRoute,
         applicationUseCase = applicationUseCase,
@@ -124,6 +136,7 @@ private fun addDirectories(
 
 private data class DDDFolderStructure(
     val name: String,
+    val parent: PsiDirectory,
     val applicationDto: PsiDirectory,
     val applicationRoute: PsiDirectory,
     val applicationUseCase: PsiDirectory,
@@ -135,19 +148,37 @@ private data class DDDFolderStructure(
 ) {
     fun createFiles() {
         val name = name.replaceFirstChar { it.uppercase() }
+        val packageName = JavaDirectoryService.getInstance().getPackage(parent)!!.qualifiedName
 
-        applicationDto.createFile("${name}Request.kt")
-        applicationDto.createFile("${name}Response.kt")
+        applicationDto.createFile(parent, "${name}Request", ::getDtoTemplate)
+        applicationDto.createFile(parent, "${name}Response", ::getDtoTemplate)
 
-        applicationRoute.createFile("${name}Routes.kt")
+        applicationRoute.createFile(parent, "${name}Routes", ::getRouteTemplate)
 
-        applicationUseCase.createFile("${name}UseCaseImpl.kt")
+        applicationUseCase.createFile(parent, "${name}UseCase", ::getUseCaseImplTemplate)
 
-        domainEntity.createFile("${name}Entity.kt")
-        domainRepository.createFile("${name}Repository.kt")
-        domainUseCase.createFile("${name}UseCase.kt")
+        domainEntity.createFile(parent, "${name}Entity", ::getEntityTemplate)
+        domainRepository.createFile(parent, "${name}Repository", ::getRepositoryTemplate)
+        domainUseCase.createFile(parent, "${name}UseCase", ::getUseCaseTemplate)
 
-        infrastructurePersistence.createFile("${name}Persistence.kt")
-        infrastructureRepository.createFile("${name}RepositoryImpl.kt")
+        infrastructurePersistence.createFile(parent, "${name}Table", ::getTableTemplate)
+        infrastructureRepository.createFile(parent, "${name}Repository", ::getRepositoryImplTemplate)
     }
+}
+
+private fun PsiDirectory.createFile(
+    parent: PsiDirectory,
+    name: String,
+    template: (String, String) -> String
+) {
+    val packageName = JavaDirectoryService.getInstance().getPackage(parent)?.qualifiedName
+
+    check(packageName != null) {
+        "Could not determine package name for directory: $this"
+    }
+
+    val file = createFile("$name.kt")
+    val document = PsiDocumentManager.getInstance(project).getDocument(file) ?: return
+
+    document.setText(template(name, packageName))
 }
