@@ -102,7 +102,7 @@ private fun addDirectories(
     dir: PsiDirectory,
     inputName: String,
 ): DDDFolderStructure {
-    val parent = dir.createSubdirectory(inputName)
+    val parent = dir.createSubdirectory(inputName.lowercase())
 
     val application = parent.createSubdirectory("application")
     val applicationDto = application.createSubdirectory("dto")
@@ -145,8 +145,6 @@ private data class DDDFolderStructure(
     val infrastructureRepository: PsiDirectory
 ) {
     fun createFiles() {
-        val name = name.replaceFirstChar { it.uppercase() }
-
         applicationDto.createFile(parent, "${name}Request", ::getDtoTemplate)
         applicationDto.createFile(parent, "${name}Response", ::getDtoTemplate)
 
